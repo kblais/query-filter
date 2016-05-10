@@ -1,0 +1,22 @@
+{
+    "name": "kblais/query-filter",
+    "description": "Easily create filters for your Eloquent model.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Killian Blais",
+            "email": "contact@killianblais.fr"
+        }
+    ],
+    "require": {
+    	"php": ">=5.4.0",
+        "illuminate/database": "5.*",
+        "illuminate/http": "5.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kblais\\QueryFilter\\": "src"
+        }
+    },
+    "minimum-stability": "dev"
+}
