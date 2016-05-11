@@ -1,5 +1,7 @@
 <?php
 
+namespace Kblais\QueryFilter\Tests;
+
 use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
 
@@ -7,7 +9,7 @@ class QueryFilterTest extends TestCase
 {
     public function testLikeFilterApplies()
     {
-        $builder = $this->makeBuilder(PostLikeFilter::class);
+        $builder = $this->makeBuilder(Filters\PostLikeFilter::class);
 
         $expected = [
             "type" => "Basic",
@@ -22,7 +24,7 @@ class QueryFilterTest extends TestCase
 
     public function testEqualsFilterApplies()
     {
-        $builder = $this->makeBuilder(PostEqualsFilter::class);
+        $builder = $this->makeBuilder(Filters\PostEqualsFilter::class);
 
         $expected = [
             "type" => "Basic",
@@ -37,7 +39,7 @@ class QueryFilterTest extends TestCase
 
     public function testRawFilterApplies()
     {
-        $builder = $this->makeBuilder(PostRawFilter::class);
+        $builder = $this->makeBuilder(Filters\PostRawFilter::class);
 
         $expected = [
             "type" => "raw",
@@ -50,7 +52,7 @@ class QueryFilterTest extends TestCase
 
     public function testTwoFiltersApplies()
     {
-        $builder = $this->makeBuilder(PostTwoFilters::class);
+        $builder = $this->makeBuilder(Filters\PostTwoFilters::class);
 
         $expected = [
             [
@@ -74,7 +76,7 @@ class QueryFilterTest extends TestCase
 
     public function testNoFilterApplies()
     {
-        $builder = $this->makeBuilder(PostNoFilter::class);
+        $builder = $this->makeBuilder(Filters\PostNoFilter::class);
 
         $this->assertempty($builder->getQuery()->wheres);
     }
@@ -99,6 +101,6 @@ class QueryFilterTest extends TestCase
 
         $filters = new $classname($request);
 
-        return Post::filter($filters);
+        return Models\Post::filter($filters);
     }
 }

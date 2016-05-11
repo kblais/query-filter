@@ -1,5 +1,7 @@
 <?php
 
+namespace Kblais\QueryFilter\Tests\Filters;
+
 use Kblais\QueryFilter\QueryFilter;
 
 class PostRawFilter extends QueryFilter

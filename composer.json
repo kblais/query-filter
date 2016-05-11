@@ -18,6 +18,11 @@
             "Kblais\\QueryFilter\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Kblais\\QueryFilter\\Tests\\": "tests"
+        }
+    },
     "minimum-stability": "dev",
     "require-dev": {
         "orchestra/testbench": "^3.2",
