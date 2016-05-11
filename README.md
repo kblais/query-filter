@@ -1,4 +1,4 @@
-# QueryFilter
+# QueryFilter [![Build Status](https://travis-ci.org/kblais/query-filter.svg?branch=master)](https://travis-ci.org/kblais/query-filter)
 
 Easily create filters for your Eloquent model.
 
