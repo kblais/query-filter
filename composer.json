@@ -9,7 +9,7 @@
         }
     ],
     "require": {
-    	"php": ">=5.4.0",
+        "php": ">=5.5.0",
         "illuminate/database": "5.*",
         "illuminate/http": "5.*"
     },
@@ -18,5 +18,9 @@
             "Kblais\\QueryFilter\\": "src"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "require-dev": {
+        "orchestra/testbench": "^3.2",
+        "phpunit/phpunit": "^4.0"
+    }
 }
