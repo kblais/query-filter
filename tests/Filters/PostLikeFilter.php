@@ -1,5 +1,7 @@
 <?php
 
+namespace Kblais\QueryFilter\Tests\Filters;
+
 use Kblais\QueryFilter\QueryFilter;
 
 class PostLikeFilter extends QueryFilter

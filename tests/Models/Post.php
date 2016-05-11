@@ -1,5 +1,7 @@
 <?php
 
+namespace Kblais\QueryFilter\Tests\Models;
+
 use Illuminate\Database\Eloquent\Model;
 use Kblais\QueryFilter\FilterableTrait;
 
