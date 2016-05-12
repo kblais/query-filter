@@ -83,8 +83,9 @@ abstract class QueryFilter
      */
     protected function like($column, $value)
     {
-        if ($this->builder->getQuery()->getConnection()->getDriverName() == 'pgsql')
+        if ($this->builder->getQuery()->getConnection()->getDriverName() == 'pgsql') {
             return $this->builder->where($column, 'ILIKE', '%' . $value . '%');
+        }
 
         return $this->builder->where($column, 'LIKE', '%' . $value . '%');
     }
