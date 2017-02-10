@@ -41,6 +41,10 @@ abstract class QueryFilter
     {
         $this->builder = $builder;
 
+        if (empty($this->filters()) && method_exists($this, '_init')) {
+            call_user_func([$this, '_init']);
+        }
+        
         foreach ($this->filters() as $name => $value) {
             if (!method_exists($this, camel_case($name))) {
                 continue;
