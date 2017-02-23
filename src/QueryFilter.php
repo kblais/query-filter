@@ -40,6 +40,10 @@ abstract class QueryFilter
     public function apply(Builder $builder)
     {
         $this->builder = $builder;
+        
+        if (empty($this->filters()) && method_exists($this, 'default')) {
+            call_user_func([$this, 'default']);
+        }
 
         foreach ($this->filters() as $name => $value) {
             if (!method_exists($this, camel_case($name))) {
