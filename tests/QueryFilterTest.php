@@ -81,6 +81,30 @@ class QueryFilterTest extends TestCase
         $this->assertempty($builder->getQuery()->wheres);
     }
 
+    public function testCallingBuilderMethods()
+    {
+        $builder = $this->makeBuilder(Filters\PostWhereFilter::class);
+
+        $expected = [
+            [
+                "type" => "Basic",
+                "column" => "title",
+                "operator" => "like",
+                "value" => "%foo%",
+                "boolean" => "and",
+            ],
+            [
+                "type" => "Basic",
+                "column" => "age",
+                "operator" => ">=",
+                "value" => 18,
+                "boolean" => "and",
+            ],
+        ];
+
+        $this->assertArraySubset($expected, $builder->getQuery()->wheres);
+    }
+
     /**
      * @return Request
      */
@@ -93,6 +117,7 @@ class QueryFilterTest extends TestCase
             'content' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo, adipisci!',
             'category' => 'bar',
             'is_long' => null,
+            'age' => 18,
         ]);
 
         return $request;
