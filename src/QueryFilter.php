@@ -46,11 +46,10 @@ abstract class QueryFilter
         }
 
         foreach ($this->filters() as $name => $value) {
-            if (!method_exists($this, camel_case($name))) {
-                continue;
+            $methodName = camel_case($name);
+            if (method_exists($this, $methodName)) {
+                call_user_func_array([$this, $methodName], array_filter([$value]));
             }
-
-            call_user_func_array([$this, camel_case($name)], array_filter([$value]));
         }
 
         return $this->builder;

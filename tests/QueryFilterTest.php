@@ -81,6 +81,9 @@ class QueryFilterTest extends TestCase
         $this->assertempty($builder->getQuery()->wheres);
     }
 
+    /**
+     * @return Request
+     */
     protected function makeRequest()
     {
         $request = new Request;
@@ -95,11 +98,15 @@ class QueryFilterTest extends TestCase
         return $request;
     }
 
-    protected function makeBuilder($classname)
+    /**
+     * @param $className
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function makeBuilder($className)
     {
         $request = $this->makeRequest();
 
-        $filters = new $classname($request);
+        $filters = new $className($request);
 
         return Models\Post::filter($filters);
     }
