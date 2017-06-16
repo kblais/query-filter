@@ -98,7 +98,7 @@ abstract class QueryFilter
      * @param array $arguments
      * @return mixed
      */
-    function __call($name, $arguments)
+    public function __call($name, $arguments)
     {
         if (method_exists($this->builder, $name)) {
             return call_user_func_array([$this->builder, $name], $arguments);
