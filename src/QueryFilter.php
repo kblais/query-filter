@@ -4,6 +4,7 @@ namespace Kblais\QueryFilter;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use ReflectionMethod;
 
 abstract class QueryFilter
 {
@@ -47,7 +48,7 @@ abstract class QueryFilter
 
         foreach ($this->filters() as $name => $value) {
             $methodName = camel_case($name);
-            if (method_exists($this, $methodName)) {
+            if ($this->shouldCall($methodName, $value)) {
                 call_user_func_array([$this, $methodName], array_filter([$value]));
             }
         }
@@ -94,6 +95,26 @@ abstract class QueryFilter
     }
 
     /**
+     * Make sure the method should be called
+     *
+     * @param string $methodName
+     * @param mixed $value
+     * @return bool
+     */
+    protected function shouldCall($methodName, $value)
+    {
+        if (!method_exists($this, $methodName)) {
+            return false;
+        }
+
+        $method = new ReflectionMethod($this, $methodName);
+
+        return array_filter([$value]) ?
+            $method->getNumberOfParameters() > 0 :
+            $method->getNumberOfParameters() === 0;
+    }
+
+    /**
      * @param string $name
      * @param array $arguments
      * @return mixed
@@ -104,4 +125,6 @@ abstract class QueryFilter
             return call_user_func_array([$this->builder, $name], $arguments);
         }
     }
+
+
 }
