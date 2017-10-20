@@ -4,7 +4,9 @@ namespace Kblais\QueryFilter;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use ReflectionMethod;
+use ReflectionParameter;
 
 abstract class QueryFilter
 {
@@ -107,11 +109,17 @@ abstract class QueryFilter
             return false;
         }
 
+        $value = array_filter([$value]);
         $method = new ReflectionMethod($this, $methodName);
 
-        return array_filter([$value]) ?
-            $method->getNumberOfParameters() > 0 :
-            $method->getNumberOfParameters() === 0;
+        if ($value) { // positive value for valid parameter
+            return $method->getNumberOfParameters() > 0;
+        }
+
+        /** @var ReflectionParameter $parameter */
+        $parameter = Arr::first($method->getParameters());
+
+        return $parameter && $parameter->isDefaultValueAvailable();
     }
 
     /**
