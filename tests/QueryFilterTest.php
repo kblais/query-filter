@@ -115,7 +115,7 @@ class QueryFilterTest extends TestCase
         $this->assertEmpty($builder->getQuery()->wheres);
     }
 
-    public function testEmptyValuesAreAllowedIfIsOptionalParameter()
+    public function testEmptyValuesAreAllowedIfThereIsAnOptionalParameter()
     {
         $request = new Request;
         $request->merge(['category' => '']);
