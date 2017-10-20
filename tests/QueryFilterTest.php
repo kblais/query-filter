@@ -105,6 +105,16 @@ class QueryFilterTest extends TestCase
         $this->assertArraySubset($expected, $builder->getQuery()->wheres);
     }
 
+    public function testCannotAcceptEmptyValues()
+    {
+        $request = new Request;
+        $request->merge(['category' => '']);
+
+        $builder = $this->makeBuilder(Filters\PostTwoFilters::class, $request);
+
+        $this->assertEmpty($builder->getQuery()->wheres);
+    }
+
     /**
      * @return Request
      */
@@ -125,11 +135,12 @@ class QueryFilterTest extends TestCase
 
     /**
      * @param $className
+     * @param Request $request
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function makeBuilder($className)
+    protected function makeBuilder($className, Request $request = null)
     {
-        $request = $this->makeRequest();
+        $request = $request ?: $this->makeRequest();
 
         $filters = new $className($request);
 
