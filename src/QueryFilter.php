@@ -50,8 +50,9 @@ abstract class QueryFilter
 
         foreach ($this->filters() as $name => $value) {
             $methodName = camel_case($name);
+            $value = array_filter([$value]);
             if ($this->shouldCall($methodName, $value)) {
-                call_user_func_array([$this, $methodName], array_filter([$value]));
+                call_user_func_array([$this, $methodName], $value);
             }
         }
 
@@ -100,26 +101,29 @@ abstract class QueryFilter
      * Make sure the method should be called
      *
      * @param string $methodName
-     * @param mixed $value
+     * @param array $value
      * @return bool
      */
-    protected function shouldCall($methodName, $value)
+    protected function shouldCall($methodName, array $value)
     {
         if (!method_exists($this, $methodName)) {
             return false;
         }
 
-        $value = array_filter([$value]);
         $method = new ReflectionMethod($this, $methodName);
 
-        if ($value) { // positive value for valid parameter
+        if ($value) {
             return $method->getNumberOfParameters() > 0;
         }
 
-        /** @var ReflectionParameter $parameter */
-        $parameter = Arr::first($method->getParameters());
+        if ($method->getNumberOfParameters() > 0) {
+            /** @var ReflectionParameter $parameter */
+            $parameter = Arr::first($method->getParameters());
 
-        return $parameter && $parameter->isDefaultValueAvailable();
+            return $parameter->isDefaultValueAvailable();
+        }
+
+        return true;
     }
 
     /**

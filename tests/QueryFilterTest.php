@@ -105,7 +105,7 @@ class QueryFilterTest extends TestCase
         $this->assertArraySubset($expected, $builder->getQuery()->wheres);
     }
 
-    public function testCannotAcceptEmptyValues()
+    public function testCannotAcceptEmptyValuesIfAParameterIsRequired()
     {
         $request = new Request;
         $request->merge(['category' => '']);
@@ -113,6 +113,27 @@ class QueryFilterTest extends TestCase
         $builder = $this->makeBuilder(Filters\PostTwoFilters::class, $request);
 
         $this->assertEmpty($builder->getQuery()->wheres);
+    }
+
+    public function testEmptyValuesAreAllowedIfIsOptionalParameter()
+    {
+        $request = new Request;
+        $request->merge(['category' => '']);
+
+        $builder = $this->makeBuilder(Filters\PostOptionalParameter::class, $request);
+
+        $expected = [
+            [
+                "type" => "Basic",
+                "column" => "category",
+                "operator" => "=",
+                "value" => "foo",
+                "boolean" => "and",
+            ],
+        ];
+
+        $this->assertNotEmpty($builder->getQuery()->wheres);
+        $this->assertArraySubset($expected, $builder->getQuery()->wheres);
     }
 
     /**
