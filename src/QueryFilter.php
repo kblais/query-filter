@@ -43,7 +43,7 @@ abstract class QueryFilter
     public function apply(Builder $builder)
     {
         $this->builder = $builder;
-        
+
         if (empty($this->filters()) && method_exists($this, 'default')) {
             call_user_func([$this, 'default']);
         }
@@ -111,19 +111,11 @@ abstract class QueryFilter
         }
 
         $method = new ReflectionMethod($this, $methodName);
+        /** @var ReflectionParameter $parameter */
+        $parameter = Arr::first($method->getParameters());
 
-        if ($value) {
-            return $method->getNumberOfParameters() > 0;
-        }
-
-        if ($method->getNumberOfParameters() > 0) {
-            /** @var ReflectionParameter $parameter */
-            $parameter = Arr::first($method->getParameters());
-
-            return $parameter->isDefaultValueAvailable();
-        }
-
-        return true;
+        return $value ? $method->getNumberOfParameters() > 0 :
+            $parameter === null || $parameter->isDefaultValueAvailable();
     }
 
     /**
@@ -137,6 +129,4 @@ abstract class QueryFilter
             return call_user_func_array([$this->builder, $name], $arguments);
         }
     }
-
-
 }
