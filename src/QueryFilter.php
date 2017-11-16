@@ -4,6 +4,9 @@ namespace Kblais\QueryFilter;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use ReflectionMethod;
+use ReflectionParameter;
 
 abstract class QueryFilter
 {
@@ -40,15 +43,16 @@ abstract class QueryFilter
     public function apply(Builder $builder)
     {
         $this->builder = $builder;
-        
+
         if (empty($this->filters()) && method_exists($this, 'default')) {
             call_user_func([$this, 'default']);
         }
 
         foreach ($this->filters() as $name => $value) {
             $methodName = camel_case($name);
-            if (method_exists($this, $methodName)) {
-                call_user_func_array([$this, $methodName], array_filter([$value]));
+            $value = array_filter([$value]);
+            if ($this->shouldCall($methodName, $value)) {
+                call_user_func_array([$this, $methodName], $value);
             }
         }
 
@@ -91,6 +95,27 @@ abstract class QueryFilter
         }
 
         return $this->builder->where($column, 'LIKE', '%' . $value . '%');
+    }
+
+    /**
+     * Make sure the method should be called
+     *
+     * @param string $methodName
+     * @param array $value
+     * @return bool
+     */
+    protected function shouldCall($methodName, array $value)
+    {
+        if (!method_exists($this, $methodName)) {
+            return false;
+        }
+
+        $method = new ReflectionMethod($this, $methodName);
+        /** @var ReflectionParameter $parameter */
+        $parameter = Arr::first($method->getParameters());
+
+        return $value ? $method->getNumberOfParameters() > 0 :
+            $parameter === null || $parameter->isDefaultValueAvailable();
     }
 
     /**
