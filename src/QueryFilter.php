@@ -2,13 +2,14 @@
 
 namespace Kblais\QueryFilter;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use ReflectionMethod;
 use ReflectionParameter;
 
-abstract class QueryFilter
+abstract class QueryFilter implements Arrayable
 {
     /**
      * The request object.
@@ -71,6 +72,13 @@ abstract class QueryFilter
         }
 
         return $this->builder;
+    }
+
+    public function toArray()
+    {
+        return array_filter($this->filters(), function ($filter) {
+            return !empty($filter);
+        });
     }
 
     /**
