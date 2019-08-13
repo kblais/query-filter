@@ -6,22 +6,10 @@ Based on [Jeffray Way's Laracast tutorial](https://github.com/laracasts/Dedicate
 
 ## Installation
 
-The library is currently not available on Composer, so you have to declare it manually in your `composer.json`.
+You can install this package via Composer with this command:
 
-To do this, add the following in your `composer.json` :
-
-```json
-{
-    "require" : {
-        "kblais/query-filter": "dev-master"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/kblais/query-filter"
-        }
-    ]
-}
+```
+composer require kblais/query-filter
 ```
 
 ## Usage
