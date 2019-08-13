@@ -2,21 +2,25 @@
 
 namespace Kblais\QueryFilter\Tests;
 
-class PostgreSQLQueryFilterTest extends QueryFilterTest
+/**
+ * @internal
+ * @covers \Kblais\QueryFilter\QueryFilter
+ */
+final class PostgreSQLQueryFilterTest
 {
     public function testLikeFilterApplies()
     {
         $builder = $this->makeBuilder(Filters\PostLikeFilter::class);
 
         $expected = [
-            "type" => "Basic",
-            "column" => "title",
-            "operator" => "ILIKE",
-            "value" => "%foo%",
-            "boolean" => "and",
+            'type' => 'Basic',
+            'column' => 'title',
+            'operator' => 'ILIKE',
+            'value' => '%foo%',
+            'boolean' => 'and',
         ];
 
-        $this->assertContains($expected, $builder->getQuery()->wheres);
+        static::assertContains($expected, $builder->getQuery()->wheres);
     }
 
     public function testTwoFiltersApplies()
@@ -25,26 +29,41 @@ class PostgreSQLQueryFilterTest extends QueryFilterTest
 
         $expected = [
             [
-                "type" => "Basic",
-                "column" => "title",
-                "operator" => "ILIKE",
-                "value" => "%foo%",
-                "boolean" => "and",
+                'type' => 'Basic',
+                'column' => 'title',
+                'operator' => 'ILIKE',
+                'value' => '%foo%',
+                'boolean' => 'and',
             ],
             [
-                "type" => "Basic",
-                "column" => "category",
-                "operator" => "=",
-                "value" => "bar",
-                "boolean" => "and",
+                'type' => 'Basic',
+                'column' => 'category',
+                'operator' => '=',
+                'value' => 'bar',
+                'boolean' => 'and',
             ],
         ];
 
-        $this->assertArraySubset($expected, $builder->getQuery()->wheres);
+        static::assertArraySubset($expected, $builder->getQuery()->wheres);
     }
 
-    protected function getEnvironmentSetUp($app)
+    private function getEnvironmentSetUp($app)
     {
         $app['config']->set('database.default', 'pgsql');
+    }
+
+    /**
+     * @param $className
+     * @param Request $request
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    private function makeBuilder($className, Request $request = null)
+    {
+        $request = $request ?: $this->makeRequest();
+
+        $filters = new $className($request);
+
+        return Models\Post::filter($filters);
     }
 }

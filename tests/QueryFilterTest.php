@@ -5,21 +5,25 @@ namespace Kblais\QueryFilter\Tests;
 use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
 
-class QueryFilterTest extends TestCase
+/**
+ * @internal
+ * @covers \Kblais\QueryFilter\QueryFilter
+ */
+final class QueryFilterTest extends TestCase
 {
     public function testLikeFilterApplies()
     {
         $builder = $this->makeBuilder(Filters\PostLikeFilter::class);
 
         $expected = [
-            "type" => "Basic",
-            "column" => "title",
-            "operator" => "LIKE",
-            "value" => "%foo%",
-            "boolean" => "and",
+            'type' => 'Basic',
+            'column' => 'title',
+            'operator' => 'LIKE',
+            'value' => '%foo%',
+            'boolean' => 'and',
         ];
 
-        $this->assertContains($expected, $builder->getQuery()->wheres);
+        static::assertContains($expected, $builder->getQuery()->wheres);
     }
 
     public function testEqualsFilterApplies()
@@ -27,14 +31,14 @@ class QueryFilterTest extends TestCase
         $builder = $this->makeBuilder(Filters\PostEqualsFilter::class);
 
         $expected = [
-            "type" => "Basic",
-            "column" => "category",
-            "operator" => "=",
-            "value" => "bar",
-            "boolean" => "and",
+            'type' => 'Basic',
+            'column' => 'category',
+            'operator' => '=',
+            'value' => 'bar',
+            'boolean' => 'and',
         ];
 
-        $this->assertContains($expected, $builder->getQuery()->wheres);
+        static::assertContains($expected, $builder->getQuery()->wheres);
     }
 
     public function testRawFilterApplies()
@@ -42,12 +46,12 @@ class QueryFilterTest extends TestCase
         $builder = $this->makeBuilder(Filters\PostRawFilter::class);
 
         $expected = [
-            "type" => "raw",
-            "sql" => "LENGTH(category) > ?",
-            "boolean" => "and",
+            'type' => 'raw',
+            'sql' => 'LENGTH(category) > ?',
+            'boolean' => 'and',
         ];
 
-        $this->assertContains($expected, $builder->getQuery()->wheres);
+        static::assertContains($expected, $builder->getQuery()->wheres);
     }
 
     public function testTwoFiltersApplies()
@@ -56,22 +60,22 @@ class QueryFilterTest extends TestCase
 
         $expected = [
             [
-                "type" => "Basic",
-                "column" => "title",
-                "operator" => "LIKE",
-                "value" => "%foo%",
-                "boolean" => "and",
+                'type' => 'Basic',
+                'column' => 'title',
+                'operator' => 'LIKE',
+                'value' => '%foo%',
+                'boolean' => 'and',
             ],
             [
-                "type" => "Basic",
-                "column" => "category",
-                "operator" => "=",
-                "value" => "bar",
-                "boolean" => "and",
+                'type' => 'Basic',
+                'column' => 'category',
+                'operator' => '=',
+                'value' => 'bar',
+                'boolean' => 'and',
             ],
         ];
 
-        $this->assertArraySubset($expected, $builder->getQuery()->wheres);
+        static::assertArraySubset($expected, $builder->getQuery()->wheres);
     }
 
     public function testNoFilterApplies()
@@ -87,61 +91,61 @@ class QueryFilterTest extends TestCase
 
         $expected = [
             [
-                "type" => "Basic",
-                "column" => "title",
-                "operator" => "like",
-                "value" => "%foo%",
-                "boolean" => "and",
+                'type' => 'Basic',
+                'column' => 'title',
+                'operator' => 'like',
+                'value' => '%foo%',
+                'boolean' => 'and',
             ],
             [
-                "type" => "Basic",
-                "column" => "age",
-                "operator" => ">=",
-                "value" => 18,
-                "boolean" => "and",
+                'type' => 'Basic',
+                'column' => 'age',
+                'operator' => '>=',
+                'value' => 18,
+                'boolean' => 'and',
             ],
         ];
 
-        $this->assertArraySubset($expected, $builder->getQuery()->wheres);
+        static::assertArraySubset($expected, $builder->getQuery()->wheres);
     }
 
     public function testCannotAcceptEmptyValuesIfAParameterIsRequired()
     {
-        $request = new Request;
+        $request = new Request();
         $request->merge(['category' => '']);
 
         $builder = $this->makeBuilder(Filters\PostTwoFilters::class, $request);
 
-        $this->assertEmpty($builder->getQuery()->wheres);
+        static::assertEmpty($builder->getQuery()->wheres);
     }
 
     public function testEmptyValuesAreAllowedIfThereIsAnOptionalParameter()
     {
-        $request = new Request;
+        $request = new Request();
         $request->merge(['category' => '']);
 
         $builder = $this->makeBuilder(Filters\PostOptionalParameter::class, $request);
 
         $expected = [
             [
-                "type" => "Basic",
-                "column" => "category",
-                "operator" => "=",
-                "value" => "foo",
-                "boolean" => "and",
+                'type' => 'Basic',
+                'column' => 'category',
+                'operator' => '=',
+                'value' => 'foo',
+                'boolean' => 'and',
             ],
         ];
 
-        $this->assertNotEmpty($builder->getQuery()->wheres);
-        $this->assertArraySubset($expected, $builder->getQuery()->wheres);
+        static::assertNotEmpty($builder->getQuery()->wheres);
+        static::assertArraySubset($expected, $builder->getQuery()->wheres);
     }
 
     /**
      * @return Request
      */
-    protected function makeRequest()
+    private function makeRequest()
     {
-        $request = new Request;
+        $request = new Request();
 
         $request->merge([
             'title' => 'foo',
@@ -157,9 +161,10 @@ class QueryFilterTest extends TestCase
     /**
      * @param $className
      * @param Request $request
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function makeBuilder($className, Request $request = null)
+    private function makeBuilder($className, Request $request = null)
     {
         $request = $request ?: $this->makeRequest();
 
