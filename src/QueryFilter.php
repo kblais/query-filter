@@ -35,9 +35,23 @@ abstract class QueryFilter
     }
 
     /**
+     * @param string $name
+     * @param array  $arguments
+     *
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        if (method_exists($this->builder, $name)) {
+            return \call_user_func_array([$this->builder, $name], $arguments);
+        }
+    }
+
+    /**
      * Apply the filters to the builder.
      *
-     * @param  Builder $builder
+     * @param Builder $builder
+     *
      * @return Builder
      */
     public function apply(Builder $builder)
@@ -45,14 +59,14 @@ abstract class QueryFilter
         $this->builder = $builder;
 
         if (empty($this->filters()) && method_exists($this, 'default')) {
-            call_user_func([$this, 'default']);
+            \call_user_func([$this, 'default']);
         }
 
         foreach ($this->filters() as $name => $value) {
             $methodName = camel_case($name);
             $value = array_filter([$value]);
             if ($this->shouldCall($methodName, $value)) {
-                call_user_func_array([$this, $methodName], $value);
+                \call_user_func_array([$this, $methodName], $value);
             }
         }
 
@@ -70,10 +84,11 @@ abstract class QueryFilter
     }
 
     /**
-     * Helper for "=" filter
+     * Helper for "=" filter.
      *
-     * @param  String $column
-     * @param  String $value
+     * @param string $column
+     * @param string $value
+     *
      * @return Builder
      */
     protected function equals($column, $value)
@@ -82,26 +97,28 @@ abstract class QueryFilter
     }
 
     /**
-     * Helper for "LIKE" filter
+     * Helper for "LIKE" filter.
      *
-     * @param  String $column
-     * @param  String $value
+     * @param string $column
+     * @param string $value
+     *
      * @return Builder
      */
     protected function like($column, $value)
     {
-        if ($this->builder->getQuery()->getConnection()->getDriverName() == 'pgsql') {
-            return $this->builder->where($column, 'ILIKE', '%' . $value . '%');
+        if ('pgsql' === $this->builder->getQuery()->getConnection()->getDriverName()) {
+            return $this->builder->where($column, 'ILIKE', '%'.$value.'%');
         }
 
-        return $this->builder->where($column, 'LIKE', '%' . $value . '%');
+        return $this->builder->where($column, 'LIKE', '%'.$value.'%');
     }
 
     /**
-     * Make sure the method should be called
+     * Make sure the method should be called.
      *
      * @param string $methodName
-     * @param array $value
+     * @param array  $value
+     *
      * @return bool
      */
     protected function shouldCall($methodName, array $value)
@@ -115,18 +132,6 @@ abstract class QueryFilter
         $parameter = Arr::first($method->getParameters());
 
         return $value ? $method->getNumberOfParameters() > 0 :
-            $parameter === null || $parameter->isDefaultValueAvailable();
-    }
-
-    /**
-     * @param string $name
-     * @param array $arguments
-     * @return mixed
-     */
-    public function __call($name, $arguments)
-    {
-        if (method_exists($this->builder, $name)) {
-            return call_user_func_array([$this->builder, $name], $arguments);
-        }
+            null === $parameter || $parameter->isDefaultValueAvailable();
     }
 }

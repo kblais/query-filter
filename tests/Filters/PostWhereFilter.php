@@ -8,7 +8,7 @@ class PostWhereFilter extends QueryFilter
 {
     public function title($value)
     {
-        $this->where('title', 'like', "%$value%");
+        $this->where('title', 'like', "%{$value}%");
     }
 
     public function age($value)
