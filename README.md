@@ -81,3 +81,10 @@ class MyController extends Controller
     }
 }
 ```
+
+## Contributing
+
+- Follow the PSR-2 Coding Standard. Use PHP-CS-Fixer to apply the conventions.
+- Add tests !
+- Create feature branches
+- One pull request per feature
