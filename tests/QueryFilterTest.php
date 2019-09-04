@@ -3,7 +3,6 @@
 namespace Kblais\QueryFilter\Tests;
 
 use Illuminate\Http\Request;
-use Orchestra\Testbench\TestCase;
 
 /**
  * @internal
