@@ -16,8 +16,7 @@
     },
     "require-dev": {
         "orchestra/testbench": "^3.6|^4.0",
-        "friendsofphp/php-cs-fixer": "^2.15",
-        "dms/phpunit-arraysubset-asserts": "^0.1.0"
+        "friendsofphp/php-cs-fixer": "^2.15"
     },
     "autoload": {
         "psr-4": {

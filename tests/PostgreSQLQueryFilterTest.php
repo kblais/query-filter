@@ -3,6 +3,7 @@
 namespace Kblais\QueryFilter\Tests;
 
 use Illuminate\Http\Request;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @internal
@@ -46,7 +47,9 @@ final class PostgreSQLQueryFilterTest extends TestCase
             ],
         ];
 
-        static::assertArraySubset($expected, $builder->getQuery()->wheres);
+        foreach ($expected as $expectedValue) {
+            static::assertContains($expectedValue, $builder->getQuery()->wheres);
+        }
     }
 
     protected function getEnvironmentSetUp($app)
