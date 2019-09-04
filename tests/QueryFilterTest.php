@@ -75,7 +75,9 @@ final class QueryFilterTest extends TestCase
             ],
         ];
 
-        static::assertArraySubset($expected, $builder->getQuery()->wheres);
+        foreach ($expected as $expectedValue) {
+            static::assertContains($expectedValue, $builder->getQuery()->wheres);
+        }
     }
 
     public function testNoFilterApplies()
@@ -106,7 +108,9 @@ final class QueryFilterTest extends TestCase
             ],
         ];
 
-        static::assertArraySubset($expected, $builder->getQuery()->wheres);
+        foreach ($expected as $expectedValue) {
+            static::assertContains($expectedValue, $builder->getQuery()->wheres);
+        }
     }
 
     public function testCannotAcceptEmptyValuesIfAParameterIsRequired()
@@ -137,7 +141,10 @@ final class QueryFilterTest extends TestCase
         ];
 
         static::assertNotEmpty($builder->getQuery()->wheres);
-        static::assertArraySubset($expected, $builder->getQuery()->wheres);
+
+        foreach ($expected as $expectedValue) {
+            static::assertContains($expectedValue, $builder->getQuery()->wheres);
+        }
     }
 
     /**

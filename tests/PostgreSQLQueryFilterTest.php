@@ -2,11 +2,14 @@
 
 namespace Kblais\QueryFilter\Tests;
 
+use Illuminate\Http\Request;
+use Orchestra\Testbench\TestCase;
+
 /**
  * @internal
  * @covers \Kblais\QueryFilter\QueryFilter
  */
-final class PostgreSQLQueryFilterTest
+final class PostgreSQLQueryFilterTest extends TestCase
 {
     public function testLikeFilterApplies()
     {
@@ -44,10 +47,12 @@ final class PostgreSQLQueryFilterTest
             ],
         ];
 
-        static::assertArraySubset($expected, $builder->getQuery()->wheres);
+        foreach ($expected as $expectedValue) {
+            static::assertContains($expectedValue, $builder->getQuery()->wheres);
+        }
     }
 
-    private function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('database.default', 'pgsql');
     }
@@ -65,5 +70,23 @@ final class PostgreSQLQueryFilterTest
         $filters = new $className($request);
 
         return Models\Post::filter($filters);
+    }
+
+    /**
+     * @return Request
+     */
+    private function makeRequest()
+    {
+        $request = new Request();
+
+        $request->merge([
+            'title' => 'foo',
+            'content' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo, adipisci!',
+            'category' => 'bar',
+            'is_long' => null,
+            'age' => 18,
+        ]);
+
+        return $request;
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use ReflectionMethod;
 use ReflectionParameter;
 
@@ -64,7 +65,7 @@ abstract class QueryFilter implements Arrayable
         }
 
         foreach ($this->filters() as $name => $value) {
-            $methodName = camel_case($name);
+            $methodName = Str::camel($name);
             $value = array_filter([$value]);
             if ($this->shouldCall($methodName, $value)) {
                 \call_user_func_array([$this, $methodName], $value);
