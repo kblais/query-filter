@@ -9,8 +9,7 @@ trait FilterableTrait
     /**
      * Filter a result set.
      *
-     * @param Builder     $query
-     * @param QueryFilter $filters
+     * @param Builder $query
      *
      * @return Builder
      */
