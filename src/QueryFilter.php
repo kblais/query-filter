@@ -28,8 +28,6 @@ abstract class QueryFilter implements Arrayable
 
     /**
      * Create a new QueryFilters instance.
-     *
-     * @param Request $request
      */
     public function __construct(Request $request)
     {
@@ -51,8 +49,6 @@ abstract class QueryFilter implements Arrayable
 
     /**
      * Apply the filters to the builder.
-     *
-     * @param Builder $builder
      *
      * @return Builder
      */
@@ -126,7 +122,6 @@ abstract class QueryFilter implements Arrayable
      * Make sure the method should be called.
      *
      * @param string $methodName
-     * @param array  $value
      *
      * @return bool
      */
