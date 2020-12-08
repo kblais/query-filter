@@ -77,16 +77,12 @@ final class PostgreSQLQueryFilterTest extends TestCase
      */
     private function makeRequest()
     {
-        $request = new Request();
-
-        $request->merge([
+        return new Request([
             'title' => 'foo',
             'content' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo, adipisci!',
             'category' => 'bar',
             'is_long' => null,
             'age' => 18,
         ]);
-
-        return $request;
     }
 }
