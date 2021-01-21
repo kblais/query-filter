@@ -3,176 +3,221 @@
 namespace Kblais\QueryFilter\Tests;
 
 use Illuminate\Http\Request;
-use Orchestra\Testbench\TestCase;
+use Kblais\QueryFilter\QueryFilter;
 
 /**
  * @internal
- * @covers \Kblais\QueryFilter\QueryFilter
+ * @coversNothing
  */
 final class QueryFilterTest extends TestCase
 {
-    public function testLikeFilterApplies()
+    public function testItDoesNotApplyWhenEmpty()
     {
-        $builder = $this->makeBuilder(Filters\PostLikeFilter::class);
+        $queryBuilder = Post::filter(PostFilter::make());
 
-        $expected = [
-            'type' => 'Basic',
-            'column' => 'title',
-            'operator' => 'LIKE',
-            'value' => '%foo%',
-            'boolean' => 'and',
-        ];
+        $eloquentBuilder = Post::query();
 
-        static::assertContains($expected, $builder->getQuery()->wheres);
+        static::assertSame(
+            $eloquentBuilder->toSql(),
+            $queryBuilder->toSql()
+        );
     }
 
-    public function testEqualsFilterApplies()
+    public function testItFiltersByTitle()
     {
-        $builder = $this->makeBuilder(Filters\PostEqualsFilter::class);
+        $queryBuilder = Post::filter(PostFilter::make(['title' => 'Lorem ipsum']));
 
-        $expected = [
-            'type' => 'Basic',
-            'column' => 'category',
-            'operator' => '=',
-            'value' => 'bar',
-            'boolean' => 'and',
-        ];
+        $eloquentBuilder = Post::where('title', 'like', '%Lorem ipsum%');
 
-        static::assertContains($expected, $builder->getQuery()->wheres);
+        static::assertSame(
+            $eloquentBuilder->toSql(),
+            $queryBuilder->toSql()
+        );
+
+        static::assertSame(
+            $eloquentBuilder->getBindings(),
+            $queryBuilder->getBindings()
+        );
     }
 
-    public function testRawFilterApplies()
+    public function testNonExistingFilterDoesNothing()
     {
-        $builder = $this->makeBuilder(Filters\PostRawFilter::class);
+        $queryBuilder = Post::filter(PostFilter::make(['content' => 'Bar']));
 
-        $expected = [
-            'type' => 'raw',
-            'sql' => 'LENGTH(category) > ?',
-            'boolean' => 'and',
-        ];
+        $eloquentBuilder = Post::query();
 
-        static::assertContains($expected, $builder->getQuery()->wheres);
+        static::assertSame(
+            $eloquentBuilder->toSql(),
+            $queryBuilder->toSql()
+        );
+
+        static::assertSame(
+            $eloquentBuilder->getBindings(),
+            $queryBuilder->getBindings()
+        );
     }
 
-    public function testTwoFiltersApplies()
+    public function testFilterWithoutParameters()
     {
-        $builder = $this->makeBuilder(Filters\PostTwoFilters::class);
+        $queryBuilder = Post::filter(PostFilter::make(['published' => true]));
 
-        $expected = [
-            [
-                'type' => 'Basic',
-                'column' => 'title',
-                'operator' => 'LIKE',
-                'value' => '%foo%',
-                'boolean' => 'and',
-            ],
-            [
-                'type' => 'Basic',
-                'column' => 'category',
-                'operator' => '=',
-                'value' => 'bar',
-                'boolean' => 'and',
-            ],
-        ];
+        $eloquentBuilder = Post::where('published', true);
 
-        foreach ($expected as $expectedValue) {
-            static::assertContains($expectedValue, $builder->getQuery()->wheres);
-        }
+        static::assertSame(
+            $eloquentBuilder->toSql(),
+            $queryBuilder->toSql()
+        );
+
+        static::assertSame(
+            $eloquentBuilder->getBindings(),
+            $queryBuilder->getBindings()
+        );
     }
 
-    public function testNoFilterApplies()
+    public function testFilterWithoutParametersWithFalse()
     {
-        $builder = $this->makeBuilder(Filters\PostNoFilter::class);
+        $queryBuilder = Post::filter(PostFilter::make(['published' => false]));
 
-        $this->assertempty($builder->getQuery()->wheres);
+        $eloquentBuilder = Post::query();
+
+        static::assertSame(
+            $eloquentBuilder->toSql(),
+            $queryBuilder->toSql()
+        );
+
+        static::assertSame(
+            $eloquentBuilder->getBindings(),
+            $queryBuilder->getBindings()
+        );
     }
 
-    public function testCallingBuilderMethods()
+    public function testFilterWithoutParametersWithNull()
     {
-        $builder = $this->makeBuilder(Filters\PostWhereFilter::class);
+        $queryBuilder = Post::filter(PostFilter::make(['published' => null]));
 
-        $expected = [
-            [
-                'type' => 'Basic',
-                'column' => 'title',
-                'operator' => 'like',
-                'value' => '%foo%',
-                'boolean' => 'and',
-            ],
-            [
-                'type' => 'Basic',
-                'column' => 'age',
-                'operator' => '>=',
-                'value' => 18,
-                'boolean' => 'and',
-            ],
-        ];
+        $eloquentBuilder = Post::query();
 
-        foreach ($expected as $expectedValue) {
-            static::assertContains($expectedValue, $builder->getQuery()->wheres);
-        }
+        static::assertSame(
+            $eloquentBuilder->toSql(),
+            $queryBuilder->toSql()
+        );
+
+        static::assertSame(
+            $eloquentBuilder->getBindings(),
+            $queryBuilder->getBindings()
+        );
     }
 
-    public function testCannotAcceptEmptyValuesIfAParameterIsRequired()
+    public function testFilterByRequest()
     {
-        $request = new Request();
-        $request->merge(['category' => '']);
+        $queryBuilder = Post::filter(
+            new PostFilter(new Request(['title' => 'Lorem ipsum']))
+        );
 
-        $builder = $this->makeBuilder(Filters\PostTwoFilters::class, $request);
+        $eloquentBuilder = Post::where('title', 'like', '%Lorem ipsum%');
 
-        static::assertEmpty($builder->getQuery()->wheres);
+        static::assertSame(
+            $eloquentBuilder->toSql(),
+            $queryBuilder->toSql()
+        );
+
+        static::assertSame(
+            $eloquentBuilder->getBindings(),
+            $queryBuilder->getBindings()
+        );
     }
 
-    public function testEmptyValuesAreAllowedIfThereIsAnOptionalParameter()
+    public function testFilterByRequestWithCustomGlobalConfig()
     {
-        $request = new Request();
-        $request->merge(['category' => '']);
+        $this->app['config']->set('query-filter.default-filters-source', 'filters');
 
-        $builder = $this->makeBuilder(Filters\PostOptionalParameter::class, $request);
+        $queryBuilder = Post::filter(
+            new PostFilter(
+                new Request(['filters' => ['title' => 'Lorem ipsum']])
+            )
+        );
 
-        $expected = [
-            [
-                'type' => 'Basic',
-                'column' => 'category',
-                'operator' => '=',
-                'value' => 'foo',
-                'boolean' => 'and',
-            ],
-        ];
+        $eloquentBuilder = Post::where('title', 'like', '%Lorem ipsum%');
 
-        static::assertNotEmpty($builder->getQuery()->wheres);
+        static::assertSame(
+            $eloquentBuilder->toSql(),
+            $queryBuilder->toSql()
+        );
 
-        foreach ($expected as $expectedValue) {
-            static::assertContains($expectedValue, $builder->getQuery()->wheres);
-        }
+        static::assertSame(
+            $eloquentBuilder->getBindings(),
+            $queryBuilder->getBindings()
+        );
     }
 
-    /**
-     * @return Request
-     */
-    private function makeRequest()
+    public function testFilterByRequestWithCustomLocalConfig()
     {
-        return new Request([
-            'title' => 'foo',
-            'content' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo, adipisci!',
-            'category' => 'bar',
-            'is_long' => null,
-            'age' => 18,
+        $request = new Request(['filters' => ['title' => 'Lorem ipsum']]);
+
+        $filter = new class($request) extends PostFilter {
+            protected ?string $source = 'filters';
+        };
+
+        $queryBuilder = Post::filter($filter);
+
+        $eloquentBuilder = Post::where('title', 'like', '%Lorem ipsum%');
+
+        static::assertSame(
+            $eloquentBuilder->toSql(),
+            $queryBuilder->toSql()
+        );
+
+        static::assertSame(
+            $eloquentBuilder->getBindings(),
+            $queryBuilder->getBindings()
+        );
+    }
+
+    public function testToArrayOutput()
+    {
+        $filterWithNull = PostFilter::make([
+            'title' => 'Foo',
+            'published' => null,
         ]);
+
+        static::assertSame(
+            ['title' => 'Foo'],
+            $filterWithNull->toArray()
+        );
+
+        $filterWithUnknownKey = PostFilter::make([
+            'title' => 'Foo',
+            'author' => 'John',
+        ]);
+
+        static::assertSame(
+            ['title' => 'Foo'],
+            $filterWithUnknownKey->toArray()
+        );
     }
 
-    /**
-     * @param $className
-     * @param Request $request
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    private function makeBuilder($className, Request $request = null)
+    public function testDependencyInjection()
     {
-        $request = $request ?: $this->makeRequest();
+        app()->instance(Request::class, new Request(['title' => 'Lorem ipsum']));
 
-        $filters = new $className($request);
+        $filter = app()->make(PostFilter::class);
 
-        return Models\Post::filter($filters);
+        static::assertSame(
+            ['title' => 'Lorem ipsum'],
+            $filter->toArray()
+        );
+    }
+}
+
+class PostFilter extends QueryFilter
+{
+    public function title($value)
+    {
+        return $this->where('title', 'like', "%{$value}%");
+    }
+
+    public function published()
+    {
+        return $this->where('published', true);
     }
 }

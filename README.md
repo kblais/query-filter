@@ -6,73 +6,102 @@ Based on [Jeffray Way's Laracast tutorial](https://github.com/laracasts/Dedicate
 
 ## Installation
 
-You can install this package via Composer with this command:
+You can install the package via composer:
 
-```
+```bash
 composer require kblais/query-filter
+```
+
+You can publish the config file with:
+
+```bash
+php artisan vendor:publish --provider="Kblais\QueryFilter\QueryFilterServiceProvider" --tag="config"
+```
+
+This is the contents of the published config file:
+
+```php
+return [
+    'default-filters-source' => '',
+];
 ```
 
 ## Usage
 
-- Create your model filters, for exemple in a `App\Http\Filters` namespace :
+A query filter is a class where you explain Eloquent it should filter models based on the input.
+
+You can call any Eloquent method directly from filter methods.
 
 ```php
-<?php
-
-namespace App\Http\Filters;
-
 use Kblais\QueryFilter\QueryFilter;
 
-class MyModelFilter extends QueryFilter
+class PostFilter extends QueryFilter
 {
-    public function foo($value)
+    public function title($value)
     {
-        return $this->builder->where('foo', 'bar');
+        return $this->where('foo', 'bar');
+    }
+
+    public function author($value)
+    {
+        return $this->whereHas('author', function ($builder) use ($value) {
+            $this->where('name', $value);
+        });
     }
 }
 ```
 
-- Then, add the `FilterableTrait` on your model to allow the use of `MyModel::filter()` :
+To allow a model to use query filters, you have to add the `Filterable` trait on your model.
 
 ```php
-<?php
-
-namespace App;
-
 use Illuminate\Database\Eloquent\Model;
-use Kblais\QueryFilter\FilterableTrait;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Kblais\QueryFilter\Filterable;
 
-class MyClass extends Model
+class Post extends Model
 {
-    use FilterableTrait;
+    use Filterable;
 }
 ```
 
-- Finally, you can use the `MyModel::filter()` method in your controller :
+You can then use the `filter()` scope from anywhere:
 
 ```php
-<?php
+// From an array:
+$filterInput = [
+    'title' => 'Les Trois Mousquetaires',
+];
 
-namespace App\Http\Controllers;
+$posts = Post::filter(PostFilter::make($filterInput))->get();
 
-use App\Http\Filters\MyModelFilter;
-use App\MyModel;
-use Kblais\QueryFilter\FilterableTrait;
-
-class MyController extends Controller
+// In a controller action:
+public function index(PostFilter $filter)
 {
-    public function index(MyModelFilter $filters)
-    {
-        $data = MyModel::filter($filters)->get();
-
-        return response()->json(compact('data'));
-    }
+    // Filter is automatically populated with Request data when injected
+    return Post::filter($filter)->get();
 }
 ```
+
+## Testing
+
+```
+composer tests
+```
+
+## Changelog
+
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
 ## Contributing
 
 - Follow the PSR-2 Coding Standard. Use PHP-CS-Fixer to apply the conventions.
-- Add tests !
-- Create feature branches
-- One pull request per feature
+- Add tests for the features you add and bugs you discover.
+
+## Credits
+
+- [Killian BLAIS](https://github.com/kblais)
+- [All Contributors](../../contributors)
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.

@@ -1,6 +1,6 @@
 {
     "name": "kblais/query-filter",
-    "description": "Easily create filters for your Eloquent model.",
+    "description": "Easily create filters for your Eloquent models.",
     "license": "MIT",
     "authors": [
         {
@@ -9,14 +9,32 @@
         }
     ],
     "require": {
-        "php": "^7.2|^8.0",
-        "illuminate/database": "^6.0|^7.0|^8.0",
-        "illuminate/http": "^6.0|^7.0|^8.0",
-        "illuminate/support": "^6.0|^7.0|^8.0"
+        "php": "^8.0",
+        "illuminate/database": "^7.29|^8.0",
+        "illuminate/http": "^7.29|^8.0",
+        "illuminate/support": "^7.29|^8.0",
+        "spatie/laravel-package-tools": "^1.1"
     },
     "require-dev": {
-        "orchestra/testbench": "^4.0|^5.0|^6.0",
-        "friendsofphp/php-cs-fixer": "^2.15"
+        "orchestra/testbench": "^5.0|^6.0",
+        "friendsofphp/php-cs-fixer": "^2.15",
+        "nunomaduro/larastan": "^0.6.12"
+    },
+    "scripts": {
+        "tests:cs": [
+            "@php ./vendor/bin/php-cs-fixer fix"
+        ],
+        "tests:stan": [
+            "@php ./vendor/bin/phpstan analyze"
+        ],
+        "tests:unit": [
+            "@php ./vendor/bin/phpunit --colors"
+        ],
+        "tests": [
+            "@tests:cs",
+            "@tests:stan",
+            "@tests:unit"
+        ]
     },
     "autoload": {
         "psr-4": {
@@ -26,6 +44,13 @@
     "autoload-dev": {
         "psr-4": {
             "Kblais\\QueryFilter\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Kblais\\QueryFilter\\QueryFilterServiceProvider"
+            ]
         }
     }
 }
