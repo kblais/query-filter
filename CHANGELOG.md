@@ -1,12 +1,14 @@
 # Changelog
 
-## Unreleased
+## v2.0.0
 
-- [BC] Remove `like()` shortcut
-- [BC] The ̀`filters()` method no longer exists
-- Minimum PHP version defined at 8.0.0
-- Minimum Laravel version defined at 7.29.0
-- Better tests
+- [BC] Remove the various builder shortcuts, and instead just use the builder dynamically
+- [BC] Minimum PHP version defined at 8.0.0
+- [BC] Minimum Laravel version defined at 7.29.0
+- Allow using an array to create a query filter
+- Add a config file to determine the default path in request parameters
+- Add a command to create a QueryFilter
+- Enhance tests
 
 ## 1.1.0 - 2016-05-12
 

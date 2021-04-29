@@ -15,20 +15,20 @@ composer require kblais/query-filter
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --provider="Kblais\QueryFilter\QueryFilterServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Kblais\QueryFilter\QueryFilterServiceProvider" --tag="query-filter-config"
 ```
 
 This is the contents of the published config file:
 
 ```php
 return [
-    'default-filters-source' => '',
+    'default-filters-source' => null,
 ];
 ```
 
 ## Usage
 
-A query filter is a class where you explain Eloquent it should filter models based on the input.
+A QueryFilter is a class to apply, based on an array or a Request, multiple conditions.
 
 You can call any Eloquent method directly from filter methods.
 
@@ -67,20 +67,22 @@ class Post extends Model
 You can then use the `filter()` scope from anywhere:
 
 ```php
-// From an array:
+// From an array...
 $filterInput = [
     'title' => 'Les Trois Mousquetaires',
 ];
 
 $posts = Post::filter(PostFilter::make($filterInput))->get();
 
-// In a controller action:
+// ...Or in a controller action
 public function index(PostFilter $filter)
 {
     // Filter is automatically populated with Request data when injected
     return Post::filter($filter)->get();
 }
 ```
+
+If your filter parameters are always placed in an array key (for example `filters`), you can define the `default-filters-source` config key in the config file, or add a `protected string $source = 'filters'` in your QueryFilter.
 
 ## Testing
 
