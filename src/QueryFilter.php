@@ -5,137 +5,101 @@ namespace Kblais\QueryFilter;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\ForwardsCalls;
+use ReflectionClass;
 use ReflectionMethod;
-use ReflectionParameter;
 
+/**
+ * @mixin \Illuminate\Database\Eloquent\Builder
+ */
 abstract class QueryFilter implements Arrayable
 {
-    /**
-     * The request object.
-     *
-     * @var Request
-     */
-    protected $request;
+    use ForwardsCalls;
 
-    /**
-     * The builder instance.
-     *
-     * @var Builder
-     */
-    protected $builder;
+    protected Builder $builder;
 
-    /**
-     * Create a new QueryFilters instance.
-     */
-    public function __construct(Request $request)
+    protected array $filters = [];
+
+    protected ?string $source = null;
+
+    final public function __construct(Request $request = null)
     {
-        $this->request = $request;
-    }
-
-    /**
-     * @param string $name
-     * @param array  $arguments
-     *
-     * @return mixed
-     */
-    public function __call($name, $arguments)
-    {
-        if (method_exists($this->builder, $name)) {
-            return \call_user_func_array([$this->builder, $name], $arguments);
+        if ($request) {
+            $this->setFiltersFromRequest($request);
         }
     }
 
-    /**
-     * Apply the filters to the builder.
-     *
-     * @return Builder
-     */
+    public function __call(string $method, array $parameters)
+    {
+        return $this->forwardCallTo($this->builder, $method, $parameters);
+    }
+
+    public static function make(array $filters = []): self
+    {
+        return (new static())->setFilters($filters);
+    }
+
     public function apply(Builder $builder)
     {
         $this->builder = $builder;
 
-        if (empty($this->filters()) && method_exists($this, 'default')) {
-            \call_user_func([$this, 'default']);
-        }
-
-        foreach ($this->filters() as $name => $value) {
+        foreach ($this->filters as $name => $value) {
             $methodName = Str::camel($name);
-            $value = array_filter([$value]);
-            if ($this->shouldCall($methodName, $value)) {
-                \call_user_func_array([$this, $methodName], $value);
+
+            if ($this->shouldCallMethod($methodName, $value)) {
+                $this->{$methodName}($value);
             }
         }
+    }
 
-        return $this->builder;
+    public function setFilters(array $filters = []): self
+    {
+        $this->filters = $filters;
+
+        return $this;
+    }
+
+    public function setFiltersFromRequest(Request $request): self
+    {
+        return $this->setFilters(
+            $request->input(
+                $this->source ?: config('query-filter.default-filters-source'),
+                []
+            )
+        );
     }
 
     public function toArray()
     {
-        return array_filter($this->filters(), function ($filter) {
-            return !empty($filter);
-        });
+        $getName = fn ($method) => $method->getName();
+
+        $classOnlyMethods = array_diff(
+            array_map($getName, (new ReflectionClass($this))->getMethods()),
+            array_map($getName, (new ReflectionClass(self::class))->getMethods())
+        );
+
+        return array_intersect_key(
+            array_filter(
+                $this->filters,
+                function ($filter) {
+                    return !empty($filter);
+                }
+            ),
+            array_flip($classOnlyMethods)
+        );
     }
 
-    /**
-     * Get all request filters data.
-     *
-     * @return array
-     */
-    protected function filters()
+    protected function shouldCallMethod(string $methodName, $value): bool
     {
-        return $this->request->all();
-    }
+        if (method_exists($this, $methodName)) {
+            $method = new ReflectionMethod($this, $methodName);
 
-    /**
-     * Helper for "=" filter.
-     *
-     * @param string $column
-     * @param string $value
-     *
-     * @return Builder
-     */
-    protected function equals($column, $value)
-    {
-        return $this->builder->where($column, $value);
-    }
-
-    /**
-     * Helper for "LIKE" filter.
-     *
-     * @param string $column
-     * @param string $value
-     *
-     * @return Builder
-     */
-    protected function like($column, $value)
-    {
-        if ('pgsql' === $this->builder->getQuery()->getConnection()->getDriverName()) {
-            return $this->builder->where($column, 'ILIKE', '%'.$value.'%');
+            return (1 === $method->getNumberOfRequiredParameters() && null !== $value)
+                || (0 === $method->getNumberOfRequiredParameters() && (bool) $value)
+            ;
         }
 
-        return $this->builder->where($column, 'LIKE', '%'.$value.'%');
-    }
-
-    /**
-     * Make sure the method should be called.
-     *
-     * @param string $methodName
-     *
-     * @return bool
-     */
-    protected function shouldCall($methodName, array $value)
-    {
-        if (!method_exists($this, $methodName)) {
-            return false;
-        }
-
-        $method = new ReflectionMethod($this, $methodName);
-        /** @var ReflectionParameter $parameter */
-        $parameter = Arr::first($method->getParameters());
-
-        return $value ? $method->getNumberOfParameters() > 0 :
-            null === $parameter || $parameter->isDefaultValueAvailable();
+        return false;
     }
 }

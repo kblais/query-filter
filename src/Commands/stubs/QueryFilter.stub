@@ -1,0 +1,10 @@
+<?php
+
+namespace {{ namespace }};
+
+use Kblais\QueryFilter\QueryFilter;
+
+class {{ class }} extends QueryFilter
+{
+	//
+}
