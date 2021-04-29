@@ -173,6 +173,31 @@ final class QueryFilterTest extends TestCase
         );
     }
 
+    public function testFilterByRequestWithLocalConfigOverriding()
+    {
+        $this->app['config']->set('query-filter.default-filters-source', 'filters');
+
+        $request = new Request(['title' => 'Lorem ipsum']);
+
+        $filter = new class($request) extends PostFilter {
+            protected ?string $source = null;
+        };
+
+        $queryBuilder = Post::filter($filter);
+
+        $eloquentBuilder = Post::where('title', 'like', '%Lorem ipsum%');
+
+        static::assertSame(
+            $eloquentBuilder->toSql(),
+            $queryBuilder->toSql()
+        );
+
+        static::assertSame(
+            $eloquentBuilder->getBindings(),
+            $queryBuilder->getBindings()
+        );
+    }
+
     public function testToArrayOutput()
     {
         $filterWithNull = PostFilter::make([

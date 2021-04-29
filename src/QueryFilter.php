@@ -21,8 +21,6 @@ abstract class QueryFilter implements Arrayable
 
     protected array $filters = [];
 
-    protected ?string $source = null;
-
     final public function __construct(Request $request = null)
     {
         if ($request) {
@@ -62,12 +60,7 @@ abstract class QueryFilter implements Arrayable
 
     public function setFiltersFromRequest(Request $request): self
     {
-        return $this->setFilters(
-            $request->input(
-                $this->source ?: config('query-filter.default-filters-source'),
-                []
-            )
-        );
+        return $this->setFilters($request->input($this->getSource(), []));
     }
 
     public function toArray()
@@ -88,6 +81,14 @@ abstract class QueryFilter implements Arrayable
             ),
             array_flip($classOnlyMethods)
         );
+    }
+
+    protected function getSource(): ?string
+    {
+        return property_exists($this, 'source')
+            ? $this->source
+            : config('query-filter.default-filters-source')
+        ;
     }
 
     protected function shouldCallMethod(string $methodName, $value): bool
