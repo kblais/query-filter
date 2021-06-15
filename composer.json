@@ -17,7 +17,7 @@
     },
     "require-dev": {
         "orchestra/testbench": "^5.0|^6.0",
-        "friendsofphp/php-cs-fixer": "^2.15",
+        "friendsofphp/php-cs-fixer": "^3.0",
         "nunomaduro/larastan": "^0.6.12"
     },
     "scripts": {
