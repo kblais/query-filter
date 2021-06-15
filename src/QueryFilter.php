@@ -5,6 +5,7 @@ namespace Kblais\QueryFilter;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
@@ -19,10 +20,12 @@ abstract class QueryFilter implements Arrayable
 
     protected Builder $builder;
 
-    protected array $filters = [];
+    protected Collection $filters;
 
     final public function __construct(Request $request = null)
     {
+        $this->filters = new Collection();
+
         if ($request) {
             $this->setFiltersFromRequest($request);
         }
@@ -53,7 +56,7 @@ abstract class QueryFilter implements Arrayable
 
     public function setFilters(array $filters = []): self
     {
-        $this->filters = $filters;
+        $this->filters = collect($filters);
 
         return $this;
     }
@@ -67,20 +70,16 @@ abstract class QueryFilter implements Arrayable
     {
         $getName = fn ($method) => $method->getName();
 
-        $classOnlyMethods = array_diff(
+        $childClassMethods = array_diff(
             array_map($getName, (new ReflectionClass($this))->getMethods()),
             array_map($getName, (new ReflectionClass(self::class))->getMethods())
         );
 
-        return array_intersect_key(
-            array_filter(
-                $this->filters,
-                function ($filter) {
-                    return !empty($filter);
-                }
-            ),
-            array_flip($classOnlyMethods)
-        );
+        return $this->filters
+            ->filter(fn ($filter) => !empty($filter))
+            ->intersectByKeys(array_flip($childClassMethods))
+            ->toArray()
+        ;
     }
 
     protected function getSource(): ?string
