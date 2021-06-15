@@ -40,9 +40,26 @@ final class QueryFilterTest extends TestCase
         );
     }
 
+    public function testItFiltersByScope()
+    {
+        $queryBuilder = Post::filter(PostFilter::make(['content' => 'Lorem ipsum']));
+
+        $eloquentBuilder = Post::where('content', 'LIKE', '%Lorem ipsum%');
+
+        static::assertSame(
+            $eloquentBuilder->toSql(),
+            $queryBuilder->toSql()
+        );
+
+        static::assertSame(
+            $eloquentBuilder->getBindings(),
+            $queryBuilder->getBindings()
+        );
+    }
+
     public function testNonExistingFilterDoesNothing()
     {
-        $queryBuilder = Post::filter(PostFilter::make(['content' => 'Bar']));
+        $queryBuilder = Post::filter(PostFilter::make(['anything' => 'Bar']));
 
         $eloquentBuilder = Post::query();
 
@@ -234,6 +251,9 @@ final class QueryFilterTest extends TestCase
     }
 }
 
+/**
+ * @mixin \Kblais\QueryFilter\Tests\Post
+ */
 class PostFilter extends QueryFilter
 {
     public function title($value)
@@ -244,5 +264,10 @@ class PostFilter extends QueryFilter
     public function published()
     {
         return $this->where('published', true);
+    }
+
+    public function content($value)
+    {
+        return $this->contentContains($value);
     }
 }

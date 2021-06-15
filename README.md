@@ -84,7 +84,23 @@ public function index(PostFilter $filter)
 
 If your filter parameters are always placed in an array key (for example `filters`), you can define the `default-filters-source` config key in the config file, or add a `protected string $source = 'filters'` in your QueryFilter.
 
+## Frequent issues
+
+### `Call to an undefined method App\QueryFilters\YourFilter::anEloquentScope().` with PHPStan
+
+To fix this error message, add the following DocBlock to your filter:
+
+```
+/**
+ * @mixin \App\Models\ModelOfYourScope
+ */
+```
+
 ## Testing
+
+The test suite is composed of 3 tests: PHPCsFixer (coding style), PHPStan (static analysis) and PHPUnit (unit tests).
+
+You can run all these tests running the following command:
 
 ```
 composer tests
