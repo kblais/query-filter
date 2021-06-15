@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.0.2
+
+- Filter values are now stored in a collection
+- Move to PHPCSFixer 3.0.*
+
 ## v2.0.0
 
 - [BC] Remove the various builder shortcuts, and instead just use the builder dynamically
