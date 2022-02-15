@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.0.0
+
+- Add Laravel ^9.0 compatibility
+- Remove PHP 7.4 compatibility
+- Remove Laravel ^7.0 compatibility
+
 ## v2.0.2
 
 - Filter values are now stored in a collection
