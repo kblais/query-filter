@@ -171,7 +171,7 @@ final class QueryFilterTest extends TestCase
     {
         $request = new Request(['filters' => ['title' => 'Lorem ipsum']]);
 
-        $filter = new class($request) extends PostFilter {
+        $filter = new class ($request) extends PostFilter {
             protected ?string $source = 'filters';
         };
 
@@ -196,7 +196,7 @@ final class QueryFilterTest extends TestCase
 
         $request = new Request(['title' => 'Lorem ipsum']);
 
-        $filter = new class($request) extends PostFilter {
+        $filter = new class ($request) extends PostFilter {
             protected ?string $source = null;
         };
 
