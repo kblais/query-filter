@@ -7,6 +7,7 @@ use Orchestra\Testbench\TestCase as Orchestra;
 
 /**
  * @internal
+ *
  * @coversNothing
  */
 abstract class TestCase extends Orchestra

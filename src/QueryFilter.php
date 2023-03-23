@@ -8,8 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
-use ReflectionClass;
-use ReflectionMethod;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Builder
@@ -71,8 +69,8 @@ abstract class QueryFilter implements Arrayable
         $getName = fn ($method) => $method->getName();
 
         $childClassMethods = array_diff(
-            array_map($getName, (new ReflectionClass($this))->getMethods()),
-            array_map($getName, (new ReflectionClass(self::class))->getMethods())
+            array_map($getName, (new \ReflectionClass($this))->getMethods()),
+            array_map($getName, (new \ReflectionClass(self::class))->getMethods())
         );
 
         return $this->filters
@@ -93,7 +91,7 @@ abstract class QueryFilter implements Arrayable
     protected function shouldCallMethod(string $methodName, $value): bool
     {
         if (method_exists($this, $methodName)) {
-            $method = new ReflectionMethod($this, $methodName);
+            $method = new \ReflectionMethod($this, $methodName);
 
             return (1 === $method->getNumberOfRequiredParameters() && null !== $value)
                 || (0 === $method->getNumberOfRequiredParameters() && (bool) $value)
