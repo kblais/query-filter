@@ -3,4 +3,4 @@ composer.lock
 
 .php-cs-fixer.cache
 .php_cs.cache
-.phpunit.result.cache
+.phpunit.cache

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\File;
 
 /**
  * @internal
+ *
  * @coversNothing
  */
 final class MakeCommandTest extends TestCase

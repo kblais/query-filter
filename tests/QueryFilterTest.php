@@ -7,6 +7,7 @@ use Kblais\QueryFilter\QueryFilter;
 
 /**
  * @internal
+ *
  * @coversNothing
  */
 final class QueryFilterTest extends TestCase
