@@ -20,7 +20,7 @@ abstract class QueryFilter implements Arrayable
 
     protected Collection $filters;
 
-    final public function __construct(Request $request = null)
+    final public function __construct(?Request $request = null)
     {
         $this->filters = new Collection();
 
@@ -66,7 +66,7 @@ abstract class QueryFilter implements Arrayable
 
     public function toArray()
     {
-        $getName = fn ($method) => $method->getName();
+        $getName = static fn ($method) => $method->getName();
 
         $childClassMethods = array_diff(
             array_map($getName, (new \ReflectionClass($this))->getMethods()),
@@ -74,7 +74,7 @@ abstract class QueryFilter implements Arrayable
         );
 
         return $this->filters
-            ->filter(fn ($filter) => !empty($filter))
+            ->filter(static fn ($filter) => !empty($filter))
             ->intersectByKeys(array_flip($childClassMethods))
             ->toArray()
         ;
@@ -84,8 +84,7 @@ abstract class QueryFilter implements Arrayable
     {
         return property_exists($this, 'source')
             ? $this->source
-            : config('query-filter.default-filters-source')
-        ;
+            : config('query-filter.default-filters-source');
     }
 
     protected function shouldCallMethod(string $methodName, $value): bool
@@ -94,8 +93,7 @@ abstract class QueryFilter implements Arrayable
             $method = new \ReflectionMethod($this, $methodName);
 
             return (1 === $method->getNumberOfRequiredParameters() && null !== $value)
-                || (0 === $method->getNumberOfRequiredParameters() && (bool) $value)
-            ;
+                || (0 === $method->getNumberOfRequiredParameters() && (bool) $value);
         }
 
         return false;

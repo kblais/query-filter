@@ -9,10 +9,7 @@ $config = new PhpCsFixer\Config();
 
 return $config->setRiskyAllowed(true)
     ->setRules([
-        '@PSR1' => true,
-        '@PhpCsFixer' => true,
         '@PSR12' => true,
-        '@PhpCsFixer:risky' => true,
     ])
     ->setFinder(PhpCsFixer\Finder::create()
         ->exclude('vendor')
