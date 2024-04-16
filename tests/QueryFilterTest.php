@@ -5,11 +5,6 @@ namespace Kblais\QueryFilter\Tests;
 use Illuminate\Http\Request;
 use Kblais\QueryFilter\QueryFilter;
 
-/**
- * @internal
- *
- * @coversNothing
- */
 final class QueryFilterTest extends TestCase
 {
     public function testItDoesNotApplyWhenEmpty()
@@ -18,7 +13,7 @@ final class QueryFilterTest extends TestCase
 
         $eloquentBuilder = Post::query();
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->toSql(),
             $queryBuilder->toSql()
         );
@@ -30,12 +25,12 @@ final class QueryFilterTest extends TestCase
 
         $eloquentBuilder = Post::where('title', 'like', '%Lorem ipsum%');
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->toSql(),
             $queryBuilder->toSql()
         );
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->getBindings(),
             $queryBuilder->getBindings()
         );
@@ -47,12 +42,12 @@ final class QueryFilterTest extends TestCase
 
         $eloquentBuilder = Post::where('content', 'LIKE', '%Lorem ipsum%');
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->toSql(),
             $queryBuilder->toSql()
         );
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->getBindings(),
             $queryBuilder->getBindings()
         );
@@ -64,12 +59,12 @@ final class QueryFilterTest extends TestCase
 
         $eloquentBuilder = Post::query();
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->toSql(),
             $queryBuilder->toSql()
         );
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->getBindings(),
             $queryBuilder->getBindings()
         );
@@ -81,12 +76,12 @@ final class QueryFilterTest extends TestCase
 
         $eloquentBuilder = Post::where('published', true);
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->toSql(),
             $queryBuilder->toSql()
         );
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->getBindings(),
             $queryBuilder->getBindings()
         );
@@ -98,12 +93,12 @@ final class QueryFilterTest extends TestCase
 
         $eloquentBuilder = Post::query();
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->toSql(),
             $queryBuilder->toSql()
         );
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->getBindings(),
             $queryBuilder->getBindings()
         );
@@ -115,12 +110,12 @@ final class QueryFilterTest extends TestCase
 
         $eloquentBuilder = Post::query();
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->toSql(),
             $queryBuilder->toSql()
         );
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->getBindings(),
             $queryBuilder->getBindings()
         );
@@ -134,12 +129,12 @@ final class QueryFilterTest extends TestCase
 
         $eloquentBuilder = Post::where('title', 'like', '%Lorem ipsum%');
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->toSql(),
             $queryBuilder->toSql()
         );
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->getBindings(),
             $queryBuilder->getBindings()
         );
@@ -157,12 +152,12 @@ final class QueryFilterTest extends TestCase
 
         $eloquentBuilder = Post::where('title', 'like', '%Lorem ipsum%');
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->toSql(),
             $queryBuilder->toSql()
         );
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->getBindings(),
             $queryBuilder->getBindings()
         );
@@ -180,12 +175,12 @@ final class QueryFilterTest extends TestCase
 
         $eloquentBuilder = Post::where('title', 'like', '%Lorem ipsum%');
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->toSql(),
             $queryBuilder->toSql()
         );
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->getBindings(),
             $queryBuilder->getBindings()
         );
@@ -205,12 +200,12 @@ final class QueryFilterTest extends TestCase
 
         $eloquentBuilder = Post::where('title', 'like', '%Lorem ipsum%');
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->toSql(),
             $queryBuilder->toSql()
         );
 
-        static::assertSame(
+        self::assertSame(
             $eloquentBuilder->getBindings(),
             $queryBuilder->getBindings()
         );
@@ -223,7 +218,7 @@ final class QueryFilterTest extends TestCase
             'published' => null,
         ]);
 
-        static::assertSame(
+        self::assertSame(
             ['title' => 'Foo'],
             $filterWithNull->toArray()
         );
@@ -233,7 +228,7 @@ final class QueryFilterTest extends TestCase
             'author' => 'John',
         ]);
 
-        static::assertSame(
+        self::assertSame(
             ['title' => 'Foo'],
             $filterWithUnknownKey->toArray()
         );
@@ -245,7 +240,7 @@ final class QueryFilterTest extends TestCase
 
         $filter = app()->make(PostFilter::class);
 
-        static::assertSame(
+        self::assertSame(
             ['title' => 'Lorem ipsum'],
             $filter->toArray()
         );
