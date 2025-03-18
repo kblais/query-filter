@@ -1,5 +1,18 @@
 # Changelog
 
+## v3.3.0
+
+- Add Laravel ^12.0 compatibility
+
+## v3.2.0
+
+- Add Laravel ^11.0 compatibility
+
+## v3.1.0
+
+- Add Laravel ^10.0 compatibility
+- Set minimum Laravel version to ^9.33
+
 ## v3.0.0
 
 - Add Laravel ^9.0 compatibility
