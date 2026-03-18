@@ -7,6 +7,8 @@ use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
 {
+    public static $latestResponse;
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('database.default', 'sqlite');
